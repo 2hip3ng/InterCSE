@@ -283,7 +283,7 @@ def cl_forward(cls,
         loss_fct_rank = nn.MarginRankingLoss(margin=0.5) 
         pairwise_ranking_loss = loss_fct_rank(z4[:, 1], z5[:, 1], y)
         # pairwise_ranking_loss = pairwise_ranking_loss * pairwise_ranking_loss * alpha
-        pairwise_ranking_loss = pairwise_ranking_loss * alpha
+        pairwise_ranking_loss = pairwise_ranking_loss * beta
 
         loss = loss + pairwise_ranking_loss
 
