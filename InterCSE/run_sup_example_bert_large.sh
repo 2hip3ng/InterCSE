@@ -23,7 +23,7 @@ python3 -W ignore -m torch.distributed.launch --nproc_per_node $NUM_GPU --master
     --output_dir result/my-sup-simcse-bert-large-uncased \
     --num_train_epochs 4 \
     --per_device_train_batch_size 64 \
-    --learning_rate 5e-5 \
+    --learning_rate 3e-5 \
     --max_seq_length 32 \
     --evaluation_strategy steps \
     --metric_for_best_model stsb_spearman \
