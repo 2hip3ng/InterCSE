@@ -174,7 +174,7 @@ which is expected to output the results in a tabular format:
 +-------+-------+-------+-------+-------+--------------+-----------------+-------+
 | STS12 | STS13 | STS14 | STS15 | STS16 | STSBenchmark | SICKRelatedness |  Avg. |
 +-------+-------+-------+-------+-------+--------------+-----------------+-------+
-| 75.30 | 84.67 | 80.19 | 85.40 | 80.82 |    84.26     |      80.39      | 81.58 |
+| 75.83 | 85.05 | 80.82 | 86.00 | 81.07 |    84.86    |      81.16     | 82.11 |
 +-------+-------+-------+-------+-------+--------------+-----------------+-------+
 ```
 
@@ -202,15 +202,18 @@ Arguments for the evaluation script are as follows,
 
 **Data**
 
-For unsupervised SimCSE, we sample 1 million sentences from English Wikipedia; for supervised SimCSE, we use the SNLI and MNLI datasets. You can run `data/download_wiki.sh` and `data/download_nli.sh` to download the two datasets.
+We use the SNLI and MNLI datasets. You can run `data/download_wiki.sh` and `data/download_nli.sh` to download the two datasets.
 
 **Training scripts**
 
-We provide example training scripts for both unsupervised and supervised SimCSE. In `run_unsup_example.sh`, we provide a single-GPU (or CPU) example for the unsupervised version, and in `run_sup_example.sh` we give a **multiple-GPU** example for the supervised version. Both scripts call `train.py` for training. We explain the arguments in following:
+We provide example training scripts. In `run_sup_example.sh` we give a **multiple-GPU** example for the supervised version on Bert-base. 
+In `run_sup_example_large.sh` we give a **multiple-GPU** example for the supervised version on Bert-large. 
+Both scripts call `train.py` for training. We explain the arguments in following:
 * `--train_file`: Training file path. We support "txt" files (one line for one sentence) and "csv" files (2-column: pair data with no hard negative; 3-column: pair data with one corresponding hard negative instance). You can use our provided Wikipedia or NLI data, or you can use your own data with the same format.
 * `--model_name_or_path`: Pre-trained checkpoints to start with. For now we support BERT-based models (`bert-base-uncased`, `bert-large-uncased`, etc.) and RoBERTa-based models (`RoBERTa-base`, `RoBERTa-large`, etc.).
 * `--temp`: Temperature for the contrastive loss.
 * `--pooler_type`: Pooling method. It's the same as the `--pooler_type` in the [evaluation part](#evaluation).
+* `--alpha_list`: interactive loss decay value. 
 * `--mlp_only_train`: We have found that for unsupervised SimCSE, it works better to train the model with MLP layer but test the model without it. You should use this argument when training unsupervised SimCSE models.
 * `--hard_negative_weight`: If using hard negatives (i.e., there are 3 columns in the training file), this is the logarithm of the weight. For example, if the weight is 1, then this argument should be set as 0 (default value).
 * `--do_mlm`: Whether to use the MLM auxiliary objective. If True:
