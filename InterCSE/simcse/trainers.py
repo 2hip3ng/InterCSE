@@ -1,5 +1,4 @@
 import collections
-from prettytable import PrettyTable
 import inspect
 import math
 import sys
@@ -121,10 +120,9 @@ class CLTrainer(Trainer):
         params = {'task_path': PATH_TO_DATA, 'usepytorch': True, 'kfold': 5}
         params['classifier'] = {'nhid': 0, 'optim': 'rmsprop', 'batch_size': 128,
                                             'tenacity': 3, 'epoch_size': 2}
-        
+
         se = senteval.engine.SE(params, batcher, prepare)
         tasks = ['STSBenchmark', 'SICKRelatedness']
-        tasks = ['STS12', 'STS13', 'STS14', 'STS15', 'STS16', 'STSBenchmark', 'SICKRelatedness']
         if eval_senteval_transfer or self.args.eval_transfer:
             tasks = ['STSBenchmark', 'SICKRelatedness', 'MR', 'CR', 'SUBJ', 'MPQA', 'SST2', 'TREC', 'MRPC']
         self.model.eval()
@@ -132,8 +130,6 @@ class CLTrainer(Trainer):
         
         stsb_spearman = results['STSBenchmark']['dev']['spearman'][0]
         sickr_spearman = results['SICKRelatedness']['dev']['spearman'][0]
-        stsb_spearman = results['STSBenchmark']['test']['spearman'][0]
-        sickr_spearman = results['SICKRelatedness']['test']['spearman'][0]
 
         metrics = {"eval_stsb_spearman": stsb_spearman, "eval_sickr_spearman": sickr_spearman, "eval_avg_sts": (stsb_spearman + sickr_spearman) / 2} 
         if eval_senteval_transfer or self.args.eval_transfer:
@@ -143,42 +139,8 @@ class CLTrainer(Trainer):
                 metrics['eval_{}'.format(task)] = results[task]['devacc']
             avg_transfer /= 7
             metrics['eval_avg_transfer'] = avg_transfer
-        
-        def print_table(task_names, scores):
-            tb = PrettyTable()
-            tb.field_names = task_names
-            tb.add_row(scores)
-            print(tb)
-        scores = []
-        task_names = []
-        for task in ['STS12', 'STS13', 'STS14', 'STS15', 'STS16', 'STSBenchmark', 'SICKRelatedness']:
-            task_names.append(task)
-            if task in results:
-                if task in ['STS12', 'STS13', 'STS14', 'STS15', 'STS16']:
-                    scores.append("%.2f" % (results[task]['all']['spearman']['all'] * 100))
-                else:
-                    scores.append("%.2f" % (results[task]['test']['spearman'].correlation * 100))
-            else:
-                scores.append("0.00")
-        task_names.append("Avg.")
-        scores.append("%.2f" % (sum([float(score) for score in scores]) / len(scores)))
-        print_table(task_names, scores)
-        
-        """
-        task_names = []
-        scores = []
-        for task in ['MR', 'CR', 'SUBJ', 'MPQA', 'SST2', 'TREC', 'MRPC']:
-            task_names.append(task)
-            if task in results:
-                scores.append("%.2f" % (results[task]['acc']))    
-            else:
-                scores.append("0.00")
-        task_names.append("Avg.")
-        scores.append("%.2f" % (sum([float(score) for score in scores]) / len(scores)))
-        print_table(task_names, scores)
-        """
+
         self.log(metrics)
-       
         return metrics
         
     def _save_checkpoint(self, model, trial, metrics=None):
@@ -192,7 +154,7 @@ class CLTrainer(Trainer):
         assert _model_unwrap(model) is self.model, "internal model should be a reference to self.model"
 
         # Determine the new best metric / best model checkpoint
-        if metrics is not None and self.args.metric_for_best_model is not None and False:
+        if metrics is not None and self.args.metric_for_best_model is not None:
             metric_to_check = self.args.metric_for_best_model
             if not metric_to_check.startswith("eval_"):
                 metric_to_check = f"eval_{metric_to_check}"
@@ -209,7 +171,6 @@ class CLTrainer(Trainer):
                 self.state.best_model_checkpoint = output_dir
 
                 # Only save model when it is the best one
-                output_dir = output_dir + "-" + str(metric_value)
                 self.save_model(output_dir)
                 if self.deepspeed:
                     self.deepspeed.save_checkpoint(output_dir)

@@ -35,4 +35,5 @@ python3 -W ignore -m torch.distributed.launch --nproc_per_node $NUM_GPU --master
     --do_train \
     --do_eval \
     --fp16 \
+    --alpha_list "10, 1, 0.1, 0.01, 0.001" \
     "$@"

@@ -267,7 +267,7 @@ def cl_forward(cls,
     loss = loss
     
     if num_sent >= 5:
-        alpha, beta = cls.get_alpha_beta()
+        alpha = cls.get_alpha()
         # pairwise ranking loss
         z4_ori = z4
         z5_ori = z5
@@ -283,7 +283,7 @@ def cl_forward(cls,
         loss_fct_rank = nn.MarginRankingLoss(margin=0.5) 
         pairwise_ranking_loss = loss_fct_rank(z4[:, 1], z5[:, 1], y)
         # pairwise_ranking_loss = pairwise_ranking_loss * pairwise_ranking_loss * alpha
-        pairwise_ranking_loss = pairwise_ranking_loss * beta
+        pairwise_ranking_loss = pairwise_ranking_loss * alpha
 
         loss = loss + pairwise_ranking_loss
 
@@ -302,12 +302,12 @@ def cl_forward(cls,
         pos_neg_label = torch.cat((pos_label, neg_label), 0)
 
         pairwise_ce_loss = loss_fct(z4z5, pos_neg_label)
-        # pairwise_ce_loss = pairwise_ce_loss * pairwise_ce_loss * beta
-        pairwise_ce_loss = pairwise_ce_loss * beta
+        # pairwise_ce_loss = pairwise_ce_loss * pairwise_ce_loss * alpha
+        pairwise_ce_loss = pairwise_ce_loss * alpha
 
         loss = loss + pairwise_ce_loss
         
-        print("matrix_wise_loss:" + str(loss - pairwise_ranking_loss - pairwise_ce_loss) + "pairwise_ranking_loss:" + str(pairwise_ranking_loss) + "pairwise_ce_loss:" + str(pairwise_ce_loss))
+        # print("matrix_wise_loss:" + str(loss - pairwise_ranking_loss - pairwise_ce_loss) + "pairwise_ranking_loss:" + str(pairwise_ranking_loss) + "pairwise_ce_loss:" + str(pairwise_ce_loss))
     elif num_sent == 4:
         # pairwise ranking loss
         z3 = nn.Softmax(dim=1)(z3)
@@ -411,30 +411,21 @@ class BertForCL(BertPreTrainedModel):
             self.lm_head = BertLMPredictionHead(config)
 
         cl_init(self, config)
-        self.step = 0
-        self.all_step = 1617
-        # self.all_step = 2208
+        self.alpha_list = self.model_args.alpha_list
+        self.alpha_list = [float(_) for _ in self.alpha_list.split(", ")]
         self.alpha = 0.001
-        self.beta = 0.001
+        self.step = 0
+        self.all_step = self.model_args.all_step
 
-    def get_alpha_beta(self):
+    def get_alpha(self):
+        cur_proportion = self.step/self.all_step
+        alpha_len = len(self.alpha_list)
+        for i in range(alpha_len):
+            if cur_proportion >= i/alpha_len and cur_proportion < (i+1)/alpha_len:
+                self.alpha = self.alpha_list[i]
+                break
         self.step += 1
-        if self.step / self.all_step < 0.2:
-            self.alpha = 100
-            self.beta = 10
-        elif self.step / self.all_step < 0.4:
-            self.alpha = 10 
-            self.beta = 1
-        elif self.step / self.all_step < 0.6:
-            self.alpha = 1 
-            self.beta = 0.1
-        elif self.step / self.all_step < 0.8:
-            self.alpha = 0.1
-            self.beta = 0.01
-        elif self.step / self.all_step < 1.0:
-            self.alpha = 0.01
-            self.beta = 0.001
-        return self.alpha, self.beta
+        return self.alpha
 
 
     def forward(self,

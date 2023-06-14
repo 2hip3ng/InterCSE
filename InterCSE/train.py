@@ -84,6 +84,16 @@ class ModelArguments:
             "with private models)."
         },
     )
+    alpha_list: str = field(
+            default="10, 1, 0.1, 0.01, 0.001",
+            metadata={"help": "interactive loss deacy list"},
+    )
+
+    all_step: Optional[int] = field(
+            default="2156",
+            metadata={"help": "all training steps"},
+    )
+
 
     # SimCSE's arguments
     temp: float = field(
