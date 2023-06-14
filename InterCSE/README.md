@@ -22,7 +22,8 @@ This repository contains the code and pre-trained models for our paper [Supervis
 
 ## Overview
 
-We propose a simple contrastive learning framework that works with both unlabeled and labeled data. Unsupervised SimCSE simply takes an input sentence and predicts itself in a contrastive learning framework, with only standard dropout used as noise. Our supervised SimCSE incorporates annotated pairs from NLI datasets into contrastive learning by using `entailment` pairs as positives and `contradiction` pairs as hard negatives. The following figure is an illustration of our models.
+We propose a interactive contrastive learning framework for Supervised Sentence Representation.
+We followed SimCSE using annotated pairs from NLI datasets into contrastive learning by using `entailment` pairs as positives and `contradiction` pairs as hard negatives. The following figure is an illustration of our models.
 
 ![](figure/model.png)
 
