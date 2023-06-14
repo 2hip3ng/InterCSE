@@ -9,16 +9,13 @@ This repository contains the code and pre-trained models for our paper [Supervis
 ## Quick Links
 
   - [Overview](#overview)
-  - [Getting Started](#getting-started)
   - [Model List](#model-list)
-  - [Use SimCSE with Huggingface](#use-simcse-with-huggingface)
-  - [Train SimCSE](#train-simcse)
+  - [Use InterCSE with Huggingface](#use-intercse-with-huggingface)
+  - [Train InterCSE](#train-intercse)
     - [Requirements](#requirements)
     - [Evaluation](#evaluation)
     - [Training](#training)
   - [Bugs or Questions?](#bugs-or-questions)
-  - [Citation](#citation)
-  - [SimCSE Elsewhere](#simcse-elsewhere)
 
 ## Overview
 
@@ -27,71 +24,20 @@ We followed SimCSE using annotated pairs from NLI datasets into contrastive lear
 
 ![](figure/model.png)
 
-## Getting Started
-
-We provide an easy-to-use sentence embedding tool based on our SimCSE model (see our [Wiki](https://github.com/princeton-nlp/SimCSE/wiki) for detailed usage). To use the tool, first install the `simcse` package from PyPI
-```bash
-pip install simcse
-```
-
-Or directly install it from our code
-```bash
-python setup.py install
-```
-
-Note that if you want to enable GPU encoding, you should install the correct version of PyTorch that supports CUDA. See [PyTorch official website](https://pytorch.org) for instructions.
-
-After installing the package, you can load our model by just two lines of code
-```python
-from simcse import SimCSE
-model = SimCSE("princeton-nlp/sup-simcse-bert-base-uncased")
-```
-See [model list](#model-list) for a full list of available models. 
-
-Then you can use our model for **encoding sentences into embeddings**
-```python
-embeddings = model.encode("A woman is reading.")
-```
-
-**Compute the cosine similarities** between two groups of sentences
-```python
-sentences_a = ['A woman is reading.', 'A man is playing a guitar.']
-sentences_b = ['He plays guitar.', 'A woman is making a photo.']
-similarities = model.similarity(sentences_a, sentences_b)
-```
-
-Or build index for a group of sentences and **search** among them
-```python
-sentences = ['A woman is reading.', 'A man is playing a guitar.']
-model.build_index(sentences)
-results = model.search("He plays guitar.")
-```
-
-We also support [faiss](https://github.com/facebookresearch/faiss), an efficient similarity search library. Just install the package following [instructions](https://github.com/princeton-nlp/SimCSE/wiki/Installation) here and `simcse` will automatically use `faiss` for efficient search.
-
-**WARNING**: We have found that `faiss` did not well support Nvidia AMPERE GPUs (3090 and A100). In that case, you should change to other GPUs or install the CPU version of `faiss` package.
-
-We also provide an easy-to-build [demo website](./demo) to show how SimCSE can be used in sentence retrieval. The code is based on [DensePhrases](https://arxiv.org/abs/2012.12624)' [repo](https://github.com/princeton-nlp/DensePhrases) and [demo](http://densephrases.korea.ac.kr) (a lot of thanks to the authors of DensePhrases). 
 
 ## Model List
 
-Our released models are listed as following. You can import these models by using the `simcse` package or using [HuggingFace's Transformers](https://github.com/huggingface/transformers). 
+Our released models are listed as following. You can import these models by using the `intercse` package or using [HuggingFace's Transformers](https://github.com/huggingface/transformers). 
 |              Model              | Avg. STS |
 |:-------------------------------|:--------:|
-|  [princeton-nlp/unsup-simcse-bert-base-uncased](https://huggingface.co/princeton-nlp/unsup-simcse-bert-base-uncased) |   76.25 |
-| [princeton-nlp/unsup-simcse-bert-large-uncased](https://huggingface.co/princeton-nlp/unsup-simcse-bert-large-uncased) |   78.41  |
-|    [princeton-nlp/unsup-simcse-roberta-base](https://huggingface.co/princeton-nlp/unsup-simcse-roberta-base)    |   76.57  |
-|    [princeton-nlp/unsup-simcse-roberta-large](https://huggingface.co/princeton-nlp/unsup-simcse-roberta-large)   |   78.90  |
-|   [princeton-nlp/sup-simcse-bert-base-uncased](https://huggingface.co/princeton-nlp/sup-simcse-bert-base-uncased)  |   81.57  |
-|  [princeton-nlp/sup-simcse-bert-large-uncased](https://huggingface.co/princeton-nlp/sup-simcse-bert-large-uncased)  |   82.21  |
-|     [princeton-nlp/sup-simcse-roberta-base](https://huggingface.co/princeton-nlp/sup-simcse-roberta-base)     |   82.52  |
-|     [princeton-nlp/sup-simcse-roberta-large](https://huggingface.co/princeton-nlp/sup-simcse-roberta-large)    |   83.76  |
+|  [2hip3ng/intercse-bert-base-uncased](https://huggingface.co/2hip3ng/intercse-bert-base-uncased) |   82.11 |
+| [2hip3ng/intercse-bert-large-uncased](https://huggingface.co/2hip3ng/intercse-bert-large-uncased) |   82.88  |
 
-Note that the results are slightly better than what we have reported in the current version of the paper after adopting a new set of hyperparameters (for hyperparamters, see the [training](#training) section).
+<!-- 
+Note that the results are slightly better than what we have reported in the current version of the paper after adopting a new set of hyperparameters (for hyperparamters, see the [training](#training) section). -->
 
-**Naming rules**: `unsup` and `sup` represent "unsupervised" (trained on Wikipedia corpus) and "supervised" (trained on NLI datasets) respectively.
 
-## Use SimCSE with Huggingface
+## Use InterCSE with Huggingface
 
 Besides using our provided sentence embedding tool, you can also easily import our models with HuggingFace's `transformers`:
 ```python
@@ -100,8 +46,8 @@ from scipy.spatial.distance import cosine
 from transformers import AutoModel, AutoTokenizer
 
 # Import our models. The package will take care of downloading the models automatically
-tokenizer = AutoTokenizer.from_pretrained("princeton-nlp/sup-simcse-bert-base-uncased")
-model = AutoModel.from_pretrained("princeton-nlp/sup-simcse-bert-base-uncased")
+tokenizer = AutoTokenizer.from_pretrained("2hip3ng/intercse-bert-base-uncased")
+model = AutoModel.from_pretrained("2hip3ng/intercse-bert-base-uncased")
 
 # Tokenize input texts
 texts = [
@@ -126,9 +72,9 @@ print("Cosine similarity between \"%s\" and \"%s\" is: %.3f" % (texts[0], texts[
 
 If you encounter any problem when directly loading the models by HuggingFace's API, you can also download the models manually from the above table and use `model = AutoModel.from_pretrained({PATH TO THE DOWNLOAD MODEL})`.
 
-## Train SimCSE
+## Train InterCSE
 
-In the following section, we describe how to train a SimCSE model by using our code.
+In the following section, we describe how to train a InterCSE model by using our code.
 
 ### Requirements
 
@@ -152,7 +98,7 @@ pip install -r requirements.txt
 ```
 
 ### Evaluation
-Our evaluation code for sentence embeddings is based on a modified version of [SentEval](https://github.com/facebookresearch/SentEval). It evaluates sentence embeddings on semantic textual similarity (STS) tasks and downstream transfer tasks. For STS tasks, our evaluation takes the "all" setting, and report Spearman's correlation. See [our paper](https://arxiv.org/pdf/2104.08821.pdf) (Appendix B) for evaluation details.
+Our evaluation code for sentence embeddings is based on a modified version of [SentEval](https://github.com/facebookresearch/SentEval). It evaluates sentence embeddings on semantic textual similarity (STS) tasks and downstream transfer tasks. For STS tasks, our evaluation takes the "all" setting, and report Spearman's correlation.
 
 Before evaluation, please download the evaluation datasets by running
 ```bash
@@ -174,7 +120,7 @@ which is expected to output the results in a tabular format:
 +-------+-------+-------+-------+-------+--------------+-----------------+-------+
 | STS12 | STS13 | STS14 | STS15 | STS16 | STSBenchmark | SICKRelatedness |  Avg. |
 +-------+-------+-------+-------+-------+--------------+-----------------+-------+
-| 75.83 | 85.05 | 80.82 | 86.00 | 81.07 |    84.86    |      81.16     | 82.11 |
+| 75.83 | 85.05 | 80.82 | 86.00 | 81.07 |    84.86     |      81.16      | 82.11 |
 +-------+-------+-------+-------+-------+--------------+-----------------+-------+
 ```
 
