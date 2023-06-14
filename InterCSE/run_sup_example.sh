@@ -18,9 +18,9 @@ export OMP_NUM_THREADS=8
 # 82.03 metric_for_best_model avg_stsb --eval_steps 200
 
 python3 -W ignore -m torch.distributed.launch --nproc_per_node $NUM_GPU --master_port $PORT_ID train.py \
-    --model_name_or_path bert \
+    --model_name_or_path bert-base-uncased \
     --train_file data/nli_for_simcse.csv \
-    --output_dir result_3/my-sup-simcse-bert-base-uncased \
+    --output_dir result/intercse-bert-base-uncased \
     --num_train_epochs 4 \
     --per_device_train_batch_size 128 \
     --learning_rate 1e-4 \
