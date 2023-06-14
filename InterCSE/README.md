@@ -223,13 +223,16 @@ For results in the paper, we use Nvidia 3090 GPUs with CUDA 11. Using different 
 
 **Hyperparameters**
 
-We use the following hyperparamters for training SimCSE:
+We use the following hyperparamters for training InterCSE:
 
-|               | Unsup. BERT | Unsup. RoBERTa | Sup.      |
-|:--------------|:-----------:|:--------------:|:---------:|
-| Batch size    | 64          | 512            | 512       |
-| Learning rate (base)  | 3e-5 | 1e-5 | 5e-5 |
-| Learning rate (large) | 1e-5 | 3e-5 | 1e-5 |
+|               | BERT-base | BERT-large | 
+|:--------------|:-----------:|:--------------:|
+| Batch size    | 512         | 256            |
+| Learning rate | 1e-4 | 3e-5 |
+| Temp          | 0.04 | 0.05 | 
+| Epochs        | 4    | 4    |
+| $\alpha$ list | [10, 1, 0.1, 0.01, 0.001]   |  [1, 0.1, 0.01, 0.001, 0.0001]    |
+
 
 
 **Convert models**
@@ -240,25 +243,6 @@ Our saved checkpoints are slightly different from Huggingface's pre-trained chec
 
 ## Bugs or questions?
 
-If you have any questions related to the code or the paper, feel free to email Tianyu (`tianyug@cs.princeton.edu`) and Xingcheng (`yxc18@mails.tsinghua.edu.cn`). If you encounter any problems when using the code, or want to report a bug, you can open an issue. Please try to specify the problem with details so we can help you better and quicker!
+If you have any questions related to the code or the paper, feel free to email Tianyu (`zhipengwang1121@gmail.com`) a. If you encounter any problems when using the code, or want to report a bug, you can open an issue. Please try to specify the problem with details so we can help you better and quicker!
 
-## Citation
 
-Please cite our paper if you use SimCSE in your work:
-
-```bibtex
-@inproceedings{gao2021simcse,
-   title={{SimCSE}: Simple Contrastive Learning of Sentence Embeddings},
-   author={Gao, Tianyu and Yao, Xingcheng and Chen, Danqi},
-   booktitle={Empirical Methods in Natural Language Processing (EMNLP)},
-   year={2021}
-}
-```
-
-## SimCSE Elsewhere
-
-We thank the community's efforts for extending SimCSE!
-
-- [Jianlin Su](https://github.com/bojone) has provided [a Chinese version of SimCSE](https://github.com/bojone/SimCSE).
-- [AK391](https://github.com/AK391) integrated to [Huggingface Spaces](https://huggingface.co/spaces) with [Gradio](https://github.com/gradio-app/gradio). See demo: [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/akhaliq/SimCSE)
-- [Nils Reimers](https://github.com/nreimers) has implemented a `sentence-transformers`-based [training code](https://colab.research.google.com/drive/1gAjXcI4uSxDE_IcvZdswFYVAo7XvPeoU?usp=sharing#scrollTo=UXUsikOc6oiB) for SimCSE.
