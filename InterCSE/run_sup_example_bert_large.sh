@@ -18,9 +18,9 @@ export OMP_NUM_THREADS=8
 # 82.03 metric_for_best_model avg_stsb --eval_steps 200
 
 python3 -W ignore -m torch.distributed.launch --nproc_per_node $NUM_GPU --master_port $PORT_ID train.py \
-    --model_name_or_path bert-large-uncased-local \
+    --model_name_or_path bert-large-uncased \
     --train_file data/nli_for_simcse.csv \
-    --output_dir result/my-sup-simcse-bert-large-uncased \
+    --output_dir result/intercse-bert-large-uncased \
     --num_train_epochs 4 \
     --per_device_train_batch_size 64 \
     --learning_rate 3e-5 \
@@ -35,4 +35,5 @@ python3 -W ignore -m torch.distributed.launch --nproc_per_node $NUM_GPU --master
     --do_train \
     --do_eval \
     --fp16 \
+    --alpha_list "10, 1, 0.1, 0.01, 0.001, 0.0001" \
     "$@"
